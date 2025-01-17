@@ -7,7 +7,7 @@ password = input("Enter your GitHub password: ")
 
 start_time = time.time()    
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False)
+    browser = p.chromium.launch(channel="chrome" ,headless=False)
     context = browser.new_context()
     page = context.new_page()
 
@@ -17,6 +17,7 @@ with sync_playwright() as p:
     # 输入用户名和密码
     page.fill("#login_field", username)
     page.fill("#password", password)
+    page.wait_for_timeout(8000)
     page.click("[name='commit']")
 
     # 验证登录成功
@@ -25,8 +26,11 @@ with sync_playwright() as p:
     print("登录成功")
 
     # 搜索功能测试
-    page.fill("input[name='q']", "testing")
-    page.press("input[name='q']", "Enter")
+    page.goto("https://github.com")
+    page.get_by_label("Search or jump to…").click()
+    page.get_by_role("combobox", name="Search").fill("testing")
+    page.wait_for_timeout(4000)
+    page.get_by_role("combobox", name="Search").press("Enter")
     page.wait_for_timeout(2000)
 
     # 验证搜索成功
@@ -37,6 +41,7 @@ with sync_playwright() as p:
     page.goto("https://github.com/new")
     page.fill("input[name='repository[name]']", "test-playwright-repo")
     page.fill("input[name='repository[description]']", "This is a test repository")
+    page.wait_for_timeout(8000)
     page.click("button[type='submit']")
     page.wait_for_timeout(2000)
 
